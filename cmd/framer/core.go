@@ -24,8 +24,8 @@ func generateImage(binaryString string) (*gg.Context, error) {
 		imageSize = 256
 		lineWidth = 2.0
 	)
-
-	radius := imageSize / gridSize / 2
+	bitSize := imageSize / gridSize
+	radius := bitSize / 2
 
 	dc := gg.NewContext(imageSize, imageSize)
 	dc.SetRGB(0, 0, 0)
@@ -42,19 +42,21 @@ func generateImage(binaryString string) (*gg.Context, error) {
 		y := math.Floor(float64(i) / gridSize)
 		x := i - (y * gridSize)
 
-		geoY := y + radius*imageSize/gridSize
-		geoX := x + radius*imageSize/gridSize
+
+		geoY := (y * bitSize)
+		geoX := (x * bitSize)
 
 		fmt.Printf("drawing bit #%f at (%f, %f)\n", i, x, y)
 		dc.SetRGB(1, 1, 1)
 
 		bit := structuredString[int(i)]
 		if bit == '1' {
-			dc.DrawCircle(geoX, geoY, radius)
-			// dc.DrawRectangle(x*imageSize/gridSize, y*imageSize/gridSize, imageSize/gridSize, imageSize/gridSize)
+			// fmt.Println("geoX,geoY,radius", geoX, geoY, radius)
+			dc.DrawCircle(geoX+radius, geoY+radius, radius)
+			// dc.DrawRectangle(geoX, geoY, bitSize, bitSize)
 			dc.Fill()
 		} else {
-			dc.DrawEllipse(geoX, geoY, radius, radius)
+			dc.DrawEllipse(geoX+radius, geoY+radius, radius, radius)
 			dc.Stroke()
 		}
 
