@@ -54,6 +54,8 @@ func (k *kreaImpl) GenImage(opts GenImageOpts) (string, error) {
 	var requestBody bytes.Buffer
 	writer := multipart.NewWriter(&requestBody)
 
+	fmt.Printf("Generating image with options: %#v\n", opts)
+
 	// Add form fields to the request.
 	writer.WriteField("image-resolution", opts.ImageResolution)
 	writer.WriteField("prompt-influence", strconv.Itoa(opts.PromptInfluence))
@@ -115,5 +117,5 @@ func findImageURLInData(data []byte) (string, error) {
 		}
 	}
 
-	return "", errors.New("no url found in response body")
+	return "", errors.New(fmt.Sprintf("no url found in response body: %#v", l))
 }
