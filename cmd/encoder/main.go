@@ -66,11 +66,11 @@ func generateGalaxy(inputString string) error {
 
 	// Iterate through each character in the input string.
 	for i, char := range inputString {
-
 		go func(client krea.Client, i int, char rune, outputDir string) {
 			if err := generateImage(client, i, char, outputDir); err != nil {
+				fmt.Printf("Error generating image: %s\n", err.Error())
 			}
-			wg.Add(1)
+			wg.Add(-1)
 		}(client, i, char, outputDir)
 	}
 
