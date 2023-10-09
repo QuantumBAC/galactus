@@ -10,7 +10,6 @@ func main() {
 	genFrames('0', '9')
 	genFrames('A', 'Z')
 	genFrames('a', 'z')
-
 }
 
 func genFrames(startChar, endChar byte) {
@@ -39,7 +38,7 @@ func genFrames(startChar, endChar byte) {
 		}
 
 		// Save the image to the local filesystem.
-		imageFileName := fmt.Sprintf("./scripts/frames/%d.png", ascii)
+		imageFileName := fmt.Sprintf("./frames/%d.png", ascii)
 		err = ioutil.WriteFile(imageFileName, imageData, 0644)
 		if err != nil {
 			fmt.Printf("Failed to write image to file for character %c (ASCII %d): %v\n", char, ascii, err)
