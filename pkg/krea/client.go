@@ -29,7 +29,7 @@ type genImageResponse struct {
 
 const baseURL = "https://canvas.krea.ai"
 
-type KreaClient interface {
+type Client interface {
 	GenImage(opts GenImageOpts) (string, error)
 }
 
@@ -37,7 +37,7 @@ type kreaImpl struct {
 	httpClient *http.Client
 }
 
-func New() KreaClient {
+func New() Client {
 	return &kreaImpl{
 		httpClient: &http.Client{},
 	}
