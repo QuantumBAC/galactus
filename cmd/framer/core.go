@@ -21,10 +21,12 @@ func convertToBinary(input int) string {
 func generateImage(binaryString string) (*gg.Context, error) {
 	fmt.Printf("generating image for string: %s\n", binaryString)
 	const (
-		imageSize = 256
-		lineWidth = 2.0
+		imageSize      = 256
+		lineWidth      = 2.0
+		paddingPercent = 0.1
 	)
 	bitSize := imageSize / gridSize
+	padding := paddingPercent * bitSize
 	radius := bitSize / 2
 
 	dc := gg.NewContext(imageSize, imageSize)
@@ -42,7 +44,6 @@ func generateImage(binaryString string) (*gg.Context, error) {
 		y := math.Floor(float64(i) / gridSize)
 		x := i - (y * gridSize)
 
-
 		geoY := (y * bitSize)
 		geoX := (x * bitSize)
 
@@ -52,11 +53,11 @@ func generateImage(binaryString string) (*gg.Context, error) {
 		bit := structuredString[int(i)]
 		if bit == '1' {
 			// fmt.Println("geoX,geoY,radius", geoX, geoY, radius)
-			dc.DrawCircle(geoX+radius, geoY+radius, radius)
+			dc.DrawCircle(geoX+radius, geoY+radius, radius-padding)
 			// dc.DrawRectangle(geoX, geoY, bitSize, bitSize)
 			dc.Fill()
 		} else {
-			dc.DrawEllipse(geoX+radius, geoY+radius, radius, radius)
+			dc.DrawEllipse(geoX+radius, geoY+radius, radius-padding, radius-padding)
 			dc.Stroke()
 		}
 
