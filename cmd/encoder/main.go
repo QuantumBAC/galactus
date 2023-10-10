@@ -52,7 +52,7 @@ func downloadAndSaveImage(url, outputDir, fileName string) error {
 	return nil
 }
 
-func generateGalaxy(inputString string) error {
+func generateGalaxy(inputString, frameGeneration string) error {
 	client := krea.New()
 	outputDir := "./output/" + inputString
 	if err := os.MkdirAll(outputDir, 0777); err != nil {
@@ -67,7 +67,7 @@ func generateGalaxy(inputString string) error {
 	// Iterate through each character in the input string.
 	for i, char := range inputString {
 		go func(client krea.Client, i int, char rune, outputDir string) {
-			if err := generateImage(client, i, char, outputDir); err != nil {
+			if err := generateImage(client, i, char, outputDir, frameGeneration); err != nil {
 				fmt.Printf("Error generating image: %s\n", err.Error())
 			}
 			wg.Add(-1)
@@ -79,9 +79,11 @@ func generateGalaxy(inputString string) error {
 	return nil
 }
 
-func generateImage(client krea.Client, i int, char rune, outputDir string) error {
+func generateImage(client krea.Client, i int, char rune, outputDir, frameGeneration string) error {
 	ascii := int(char)
 	binaryString := convertToBinary(ascii)
+
+	frameImageURL := fmt.Sprintf("%s%s/%d.png", imageURLBase, frameGeneration, ascii)
 
 	// Call the GenImage function with the binary representation.
 	// Replace {binary representation} with the actual binaryString and set up your client and krea.GenImageOpts.
@@ -91,7 +93,7 @@ func generateImage(client krea.Client, i int, char rune, outputDir string) error
 		ControlnetConditioningScale: 1.5,
 		DiffusionSteps:              30,
 		PatternURL:                  1.5,
-		ImageURL:                    fmt.Sprintf("%s%d.png", imageURLBase, ascii),
+		ImageURL:                    frameImageURL,
 		Prompt:                      defaultPrompt,         // TODO make this configurable
 		NegativePrompt:              defaultNegativePrompt, // TODO make this configurable
 	})
@@ -121,12 +123,14 @@ func main() {
 		Long:  "A simple experiment on top of Krea.ai to encode a string into a planetary array.",
 	}
 	rootCmd.PersistentFlags().StringP("string", "s", "", "Input string")
+	rootCmd.PersistentFlags().StringP("generation", "g", "v0", "Frame Generation to use")
 	rootCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		inputString, _ := cmd.Flags().GetString("string")
+		frameGeneration, _ := cmd.Flags().GetString("generation")
 		if inputString == "" {
 			return errors.New("Usage: myapp --string 'your string here'")
 		} else {
-			return generateGalaxy(inputString)
+			return generateGalaxy(inputString, frameGeneration)
 		}
 	}
 
