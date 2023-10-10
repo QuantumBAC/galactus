@@ -1,6 +1,9 @@
 package main
 
 import (
+	"math/rand"
+	"time"
+
 	"github.com/spf13/cobra"
 )
 
@@ -14,5 +17,7 @@ func init() {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	cobra.CheckErr(rootCmd.Execute())
 }
