@@ -19,6 +19,40 @@ func convertToBinary(input int) string {
 	return strconv.FormatInt(int64(input), 2)
 }
 
+func drawSpiral(dc *gg.Context, x, y, maxRadius float64) {
+	// Constants for the spiral
+	turns := 5.0    // Number of spiral turns
+	segments := 100 // Number of line segments to approximate the spiral
+
+	// Calculate the angle increment based on the number of segments and turns
+	angleIncrement := 360.0 * turns / float64(segments)
+
+	// Start drawing the spiral
+	dc.MoveTo(x, y)
+	for i := 0; i < segments; i++ {
+		// Calculate the current angle in radians
+		angle := float64(i) * angleIncrement * math.Pi / 180
+
+		// Calculate the current maxRadius based on the angle
+		currentRadius := (float64(i) / float64(segments-1)) * maxRadius
+
+		if currentRadius > maxRadius {
+			currentRadius = maxRadius
+		}
+
+		// Calculate the coordinates for the current point on the spiral
+		currentX := x + currentRadius*math.Cos(angle)
+		currentY := y + currentRadius*math.Sin(angle)
+
+		// fmt.Printf("currentX: %v, currentY: %v, currentRadius: %v, angle: %v \n", currentX, currentY, currentRadius, angle)
+
+		dc.LineTo(currentX, currentY)
+	}
+
+	// Stroke the path to actually draw the spiral
+	dc.Stroke()
+}
+
 func generateImage(binaryString string) (*gg.Context, error) {
 	fmt.Printf("generating image for string: %s\n", binaryString)
 
@@ -59,6 +93,8 @@ func generateImage(binaryString string) (*gg.Context, error) {
 		noiseX := math.Floor(rand.Float64() * margin)
 		noiseY := math.Floor(rand.Float64() * margin)
 
+		// fmt.Println("margin, margin, noiseX, noiseY", margin, margin, noiseX, noiseY)
+
 		// now we convert that theoretical plane into proper units for use in this canvas context
 		geoY := (y * bitSize) + noiseY
 		geoX := (x * bitSize) + noiseX
@@ -69,7 +105,10 @@ func generateImage(binaryString string) (*gg.Context, error) {
 		bit := structuredString[int(i)]
 		if bit == '1' {
 			// if the bit is truthy, we want to draw a filled in circle
-			dc.DrawCircle(geoX+radius, geoY+radius, radius-margin)
+
+			// fmt.Println("geoX,geoY,radius", geoX, geoY, radius)
+			drawSpiral(dc, geoX+radius, geoY+radius, radius-margin)
+			// dc.DrawCircle(geoX+radius, geoY+radius, radius-margin)
 			// dc.DrawRectangle(geoX, geoY, bitSize, bitSize)
 			dc.Fill()
 		} else {
